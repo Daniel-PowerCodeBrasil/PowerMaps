@@ -36,6 +36,7 @@
     <resources>
       <code path="index.ts" order="1" />
       <css path="css/HeatMapControl.css" order="1" />
+      <resx path="strings/HeatMapControl.1046.resx" version="1.0.0" />
     </resources>
   </control>
 </manifest>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+
+  <!-- Controle -->
+  <data name="HeatMapControl_DisplayName" xml:space="preserve">
+    <value>Mapa de Calor</value>
+  </data>
+  <data name="HeatMapControl_Description" xml:space="preserve">
+    <value>Exibe ocorrências geolocalizadas como mapa de calor ou marcadores num mapa interativo.</value>
+  </data>
+
+  <!-- Dataset -->
+  <data name="occurrences_DisplayName" xml:space="preserve">
+    <value>Ocorrências</value>
+  </data>
+
+  <!-- Property-sets do dataset -->
+  <data name="latitude_DisplayName" xml:space="preserve">
+    <value>Latitude</value>
+  </data>
+  <data name="longitude_DisplayName" xml:space="preserve">
+    <value>Longitude</value>
+  </data>
+  <data name="weight_DisplayName" xml:space="preserve">
+    <value>Intensidade</value>
+  </data>
+  <data name="label_DisplayName" xml:space="preserve">
+    <value>Rótulo</value>
+  </data>
+
+  <!-- Propriedades de entrada -->
+  <data name="enableHeatmap_DisplayName" xml:space="preserve">
+    <value>Ativar Mapa de Calor</value>
+  </data>
+  <data name="heatRadius_DisplayName" xml:space="preserve">
+    <value>Raio do Calor</value>
+  </data>
+  <data name="heatMaxZoom_DisplayName" xml:space="preserve">
+    <value>Zoom de Intensidade Máxima</value>
+  </data>
+  <data name="initialLat_DisplayName" xml:space="preserve">
+    <value>Latitude Inicial</value>
+  </data>
+  <data name="initialLng_DisplayName" xml:space="preserve">
+    <value>Longitude Inicial</value>
+  </data>
+  <data name="initialZoom_DisplayName" xml:space="preserve">
+    <value>Zoom Inicial</value>
+  </data>
+  <data name="tileUrl_DisplayName" xml:space="preserve">
+    <value>URL dos Tiles</value>
+  </data>
+</root>
