@@ -1,21 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="PowerMaps" constructor="HeatMapControl" version="1.0.0"
+  <control namespace="PowerMaps" constructor="HeatMapControl" version="1.0.1"
            display-name-key="HeatMapControl_DisplayName"
            description-key="HeatMapControl_Description"
            control-type="standard">
 
-    <!-- Dataset: occurrences -->
-    <data-set name="occurrences" display-name-key="occurrences_DisplayName">
-      <property-set name="latitude"  display-name-key="latitude_DisplayName"
-                    of-type="Decimal" usage="bound" required="true" />
-      <property-set name="longitude" display-name-key="longitude_DisplayName"
-                    of-type="Decimal" usage="bound" required="true" />
-      <property-set name="weight"    display-name-key="weight_DisplayName"
-                    of-type="Decimal" usage="bound" required="false" />
-      <property-set name="label"     display-name-key="label_DisplayName"
-                    of-type="SingleLine.Text" usage="bound" required="false" />
-    </data-set>
+    <!-- JSON array: [{"lat":0,"lng":0,"weight":1,"label":""},...] -->
+    <property name="occurrencesJson" display-name-key="occurrencesJson_DisplayName"
+              of-type="Multiple" usage="input" />
 
     <!-- Input properties -->
     <property name="enableHeatmap" display-name-key="enableHeatmap_DisplayName"

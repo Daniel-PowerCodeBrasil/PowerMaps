@@ -97,34 +97,28 @@ export class HeatMapControl
   private _readPoints(
     context: ComponentFramework.Context<IInputs>
   ): OccurrencePoint[] {
-    const dataset = context.parameters.occurrences;
-    const points: OccurrencePoint[] = [];
+    const raw = context.parameters.occurrencesJson.raw;
+    if (!raw) return [];
 
-    if (!dataset || !dataset.sortedRecordIds) return points;
+    try {
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return [];
 
-    for (const recordId of dataset.sortedRecordIds) {
-      const record = dataset.records[recordId];
-      if (!record) continue;
-
-      const latRaw = record.getValue("latitude");
-      const lngRaw = record.getValue("longitude");
-
-      const lat = Number(latRaw);
-      const lng = Number(lngRaw);
-
-      if (isNaN(lat) || isNaN(lng)) continue;
-
-      const weightRaw = record.getValue("weight");
-      const weight =
-        weightRaw != null && !isNaN(Number(weightRaw)) ? Number(weightRaw) : 1;
-
-      const labelRaw = record.getValue("label");
-      const label = labelRaw != null ? String(labelRaw) : "";
-
-      points.push({ lat, lng, weight, label });
+      return parsed.reduce<OccurrencePoint[]>((acc, item) => {
+        const lat = Number(item.lat ?? item.latitude);
+        const lng = Number(item.lng ?? item.longitude);
+        if (isNaN(lat) || isNaN(lng)) return acc;
+        acc.push({
+          lat,
+          lng,
+          weight: item.weight != null && !isNaN(Number(item.weight)) ? Number(item.weight) : 1,
+          label: item.label != null ? String(item.label) : "",
+        });
+        return acc;
+      }, []);
+    } catch {
+      return [];
     }
-
-    return points;
   }
 
   private _render(

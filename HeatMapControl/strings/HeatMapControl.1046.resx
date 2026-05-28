@@ -47,23 +47,9 @@
     <value>Exibe ocorrências geolocalizadas como mapa de calor ou marcadores num mapa interativo.</value>
   </data>
 
-  <!-- Dataset -->
-  <data name="occurrences_DisplayName" xml:space="preserve">
-    <value>Ocorrências</value>
-  </data>
-
-  <!-- Property-sets do dataset -->
-  <data name="latitude_DisplayName" xml:space="preserve">
-    <value>Latitude</value>
-  </data>
-  <data name="longitude_DisplayName" xml:space="preserve">
-    <value>Longitude</value>
-  </data>
-  <data name="weight_DisplayName" xml:space="preserve">
-    <value>Intensidade</value>
-  </data>
-  <data name="label_DisplayName" xml:space="preserve">
-    <value>Rótulo</value>
+  <!-- Dados JSON -->
+  <data name="occurrencesJson_DisplayName" xml:space="preserve">
+    <value>Ocorrências (JSON)</value>
   </data>
 
   <!-- Propriedades de entrada -->
