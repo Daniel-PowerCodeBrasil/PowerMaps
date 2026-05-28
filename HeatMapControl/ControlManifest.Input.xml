@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="PowerMapsBR" constructor="HeatMapControl" version="1.0.6"
+  <control namespace="PowerMapsBR" constructor="HeatMapControl" version="1.0.7"
            display-name-key="HeatMapControl_DisplayName"
            description-key="HeatMapControl_Description"
            control-type="standard">
@@ -29,7 +29,6 @@
 
     <resources>
       <code path="index.ts" order="1" />
-      <css path="css/HeatMapControl.css" order="1" />
       <resx path="strings/HeatMapControl.1033.resx" version="1.0.0" />
     </resources>
   </control>
