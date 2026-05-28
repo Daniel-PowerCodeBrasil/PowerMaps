@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ImportExportXml version="9.0.0.0013" SolutionPackageVersion="9.1" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SolutionManifest>
-    <UniqueName>FiberGuard</UniqueName>
+    <UniqueName>PowerMaps</UniqueName>
     <LocalizedNames>
-      <LocalizedName description="FiberGuard" languagecode="1033"/>
+      <LocalizedName description="PowerMaps" languagecode="1033"/>
     </LocalizedNames>
     <Descriptions/>
     <Version>1.0.0.0</Version>
     <Managed>0</Managed>
     <Publisher>
-      <UniqueName>fg</UniqueName>
+      <UniqueName>pm</UniqueName>
       <LocalizedNames>
-        <LocalizedName description="FiberGuard" languagecode="1033"/>
+        <LocalizedName description="PowerMaps" languagecode="1033"/>
       </LocalizedNames>
       <Descriptions/>
       <EMailAddress/>
       <SupportingWebsiteUrl/>
-      <CustomizationPrefix>fg</CustomizationPrefix>
+      <CustomizationPrefix>pm</CustomizationPrefix>
       <CustomizationOptionValuePrefix>10000</CustomizationOptionValuePrefix>
       <Addresses>
         <Address>
@@ -78,7 +78,7 @@
       </Addresses>
     </Publisher>
     <RootComponents>
-      <RootComponent type="66" schemaName="FiberGuard.HeatMapControl" behavior="0"/>
+      <RootComponent type="66" schemaName="PowerMaps.HeatMapControl" behavior="0"/>
     </RootComponents>
     <MissingDependencies/>
   </SolutionManifest>
