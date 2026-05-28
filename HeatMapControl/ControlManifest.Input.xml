@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest>
+  <control namespace="FiberGuard" constructor="HeatMapControl" version="1.0.0"
+           display-name-key="HeatMapControl_DisplayName"
+           description-key="HeatMapControl_Description"
+           control-type="standard">
+
+    <!-- Dataset: occurrences -->
+    <data-set name="occurrences" display-name-key="occurrences_DisplayName">
+      <property-set name="latitude"  display-name-key="latitude_DisplayName"
+                    of-type="Decimal" usage="bound" required="true" />
+      <property-set name="longitude" display-name-key="longitude_DisplayName"
+                    of-type="Decimal" usage="bound" required="true" />
+      <property-set name="weight"    display-name-key="weight_DisplayName"
+                    of-type="Decimal" usage="bound" required="false" />
+      <property-set name="label"     display-name-key="label_DisplayName"
+                    of-type="SingleLine.Text" usage="bound" required="false" />
+    </data-set>
+
+    <!-- Input properties -->
+    <property name="enableHeatmap" display-name-key="enableHeatmap_DisplayName"
+              of-type="TwoOptions" usage="input" />
+    <property name="heatRadius"    display-name-key="heatRadius_DisplayName"
+              of-type="Whole.None" usage="input" default-value="25" />
+    <property name="heatMaxZoom"   display-name-key="heatMaxZoom_DisplayName"
+              of-type="Whole.None" usage="input" default-value="17" />
+    <property name="initialLat"    display-name-key="initialLat_DisplayName"
+              of-type="Decimal" usage="input" default-value="-22.2171" />
+    <property name="initialLng"    display-name-key="initialLng_DisplayName"
+              of-type="Decimal" usage="input" default-value="-49.9501" />
+    <property name="initialZoom"   display-name-key="initialZoom_DisplayName"
+              of-type="Whole.None" usage="input" default-value="12" />
+    <property name="tileUrl"       display-name-key="tileUrl_DisplayName"
+              of-type="SingleLine.Text" usage="input" />
+
+    <resources>
+      <code path="index.ts" order="1" />
+      <css path="css/HeatMapControl.css" order="1" />
+    </resources>
+  </control>
+</manifest>

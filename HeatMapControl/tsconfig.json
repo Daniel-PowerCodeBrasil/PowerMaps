@@ -1,0 +1,14 @@
+{
+  "extends": "./node_modules/pcf-scripts/tsconfig_base.json",
+  "compilerOptions": {
+    "typeRoots": ["node_modules/@types"],
+    "paths": {
+      "leaflet": ["./node_modules/@types/leaflet"]
+    }
+  },
+  "include": [
+    "index.ts",
+    "src/**/*.ts",
+    "generated/**/*.ts"
+  ]
+}
