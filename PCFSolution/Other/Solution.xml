@@ -6,8 +6,8 @@
       <LocalizedName description="PowerMaps" languagecode="1033"/>
     </LocalizedNames>
     <Descriptions/>
-    <Version>1.0.8.0</Version>
-    <Managed>0</Managed>
+    <Version>1.0.9.0</Version>
+    <Managed>1</Managed>
     <Publisher>
       <UniqueName>pm</UniqueName>
       <LocalizedNames>
