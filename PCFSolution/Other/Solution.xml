@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImportExportXml version="9.0.0.0013" SolutionPackageVersion="9.1" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SolutionManifest>
+    <UniqueName>FiberGuard</UniqueName>
+    <LocalizedNames>
+      <LocalizedName description="FiberGuard" languagecode="1033"/>
+    </LocalizedNames>
+    <Descriptions/>
+    <Version>1.0.0.0</Version>
+    <Managed>0</Managed>
+    <Publisher>
+      <UniqueName>fg</UniqueName>
+      <LocalizedNames>
+        <LocalizedName description="FiberGuard" languagecode="1033"/>
+      </LocalizedNames>
+      <Descriptions/>
+      <EMailAddress/>
+      <SupportingWebsiteUrl/>
+      <CustomizationPrefix>fg</CustomizationPrefix>
+      <CustomizationOptionValuePrefix>10000</CustomizationOptionValuePrefix>
+      <Addresses>
+        <Address>
+          <AddressNumber>1</AddressNumber>
+          <AddressTypeCode>1</AddressTypeCode>
+          <City/>
+          <County/>
+          <Country/>
+          <Fax/>
+          <FreightTermsCode xsi:nil="true"/>
+          <ImportSequenceNumber xsi:nil="true"/>
+          <Latitude xsi:nil="true"/>
+          <Line1/>
+          <Line2/>
+          <Line3/>
+          <Longitude xsi:nil="true"/>
+          <Name/>
+          <PostalCode/>
+          <PostOfficeBox/>
+          <PrimaryContactName/>
+          <ShippingMethodCode>1</ShippingMethodCode>
+          <StateOrProvince/>
+          <Telephone1/>
+          <Telephone2/>
+          <Telephone3/>
+          <TimeZoneRuleVersionNumber xsi:nil="true"/>
+          <UPSZone/>
+          <UTCOffset xsi:nil="true"/>
+          <WebSiteUrl/>
+        </Address>
+        <Address>
+          <AddressNumber>2</AddressNumber>
+          <AddressTypeCode>2</AddressTypeCode>
+          <City/>
+          <County/>
+          <Country/>
+          <Fax/>
+          <FreightTermsCode xsi:nil="true"/>
+          <ImportSequenceNumber xsi:nil="true"/>
+          <Latitude xsi:nil="true"/>
+          <Line1/>
+          <Line2/>
+          <Line3/>
+          <Longitude xsi:nil="true"/>
+          <Name/>
+          <PostalCode/>
+          <PostOfficeBox/>
+          <PrimaryContactName/>
+          <ShippingMethodCode>1</ShippingMethodCode>
+          <StateOrProvince/>
+          <Telephone1/>
+          <Telephone2/>
+          <Telephone3/>
+          <TimeZoneRuleVersionNumber xsi:nil="true"/>
+          <UPSZone/>
+          <UTCOffset xsi:nil="true"/>
+          <WebSiteUrl/>
+        </Address>
+      </Addresses>
+    </Publisher>
+    <RootComponents>
+      <RootComponent type="66" schemaName="FiberGuard.HeatMapControl" behavior="0"/>
+    </RootComponents>
+    <MissingDependencies/>
+  </SolutionManifest>
+</ImportExportXml>
