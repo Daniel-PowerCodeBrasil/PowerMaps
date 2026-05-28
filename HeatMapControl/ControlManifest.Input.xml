@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="PowerMapsBR" constructor="HeatMapControl" version="1.0.3"
+  <control namespace="PowerMapsBR" constructor="HeatMapControl" version="1.0.4"
            display-name-key="HeatMapControl_DisplayName"
            description-key="HeatMapControl_Description"
            control-type="standard">
+
+    <external-service-usage enabled="false" />
 
     <!-- JSON array: [{"lat":0,"lng":0,"weight":1,"label":""},...] -->
     <property name="occurrencesJson" display-name-key="occurrencesJson_DisplayName"
