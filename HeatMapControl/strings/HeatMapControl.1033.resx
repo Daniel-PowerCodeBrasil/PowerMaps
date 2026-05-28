@@ -38,40 +38,16 @@
   <resheader name="version">
     <value>2.0</value>
   </resheader>
-
-  <!-- Controle -->
   <data name="HeatMapControl_DisplayName" xml:space="preserve">
-    <value>Mapa de Calor</value>
+    <value>PowerMaps HeatMap</value>
   </data>
   <data name="HeatMapControl_Description" xml:space="preserve">
-    <value>Exibe ocorrências geolocalizadas como mapa de calor ou marcadores num mapa interativo.</value>
+    <value>Heat map control diagnostic build.</value>
   </data>
-
-  <!-- Dados JSON -->
-  <data name="occurrencesJson_DisplayName" xml:space="preserve">
-    <value>Ocorrências (JSON)</value>
+  <data name="sampleProperty_DisplayName" xml:space="preserve">
+    <value>Sample Property</value>
   </data>
-
-  <!-- Propriedades de entrada -->
-  <data name="enableHeatmap_DisplayName" xml:space="preserve">
-    <value>Ativar Mapa de Calor</value>
-  </data>
-  <data name="heatRadius_DisplayName" xml:space="preserve">
-    <value>Raio do Calor</value>
-  </data>
-  <data name="heatMaxZoom_DisplayName" xml:space="preserve">
-    <value>Zoom de Intensidade Máxima</value>
-  </data>
-  <data name="initialLat_DisplayName" xml:space="preserve">
-    <value>Latitude Inicial</value>
-  </data>
-  <data name="initialLng_DisplayName" xml:space="preserve">
-    <value>Longitude Inicial</value>
-  </data>
-  <data name="initialZoom_DisplayName" xml:space="preserve">
-    <value>Zoom Inicial</value>
-  </data>
-  <data name="tileUrl_DisplayName" xml:space="preserve">
-    <value>URL dos Tiles</value>
+  <data name="sampleProperty_Desc" xml:space="preserve">
+    <value>Sample bound property.</value>
   </data>
 </root>

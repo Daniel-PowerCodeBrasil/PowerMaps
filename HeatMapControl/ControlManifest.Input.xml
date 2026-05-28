@@ -1,31 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="PowerMapsBR" constructor="HeatMapControl" version="1.0.7"
+  <control namespace="PowerMapsBR" constructor="HeatMapControl" version="1.0.8"
            display-name-key="HeatMapControl_DisplayName"
            description-key="HeatMapControl_Description"
            control-type="standard">
 
     <external-service-usage enabled="false" />
 
-    <!-- JSON array: [{"lat":0,"lng":0,"weight":1,"label":""},...] -->
-    <property name="occurrencesJson" display-name-key="occurrencesJson_DisplayName"
-              of-type="Multiple" usage="input" />
-
-    <!-- Input properties -->
-    <property name="enableHeatmap" display-name-key="enableHeatmap_DisplayName"
-              of-type="TwoOptions" usage="input" />
-    <property name="heatRadius"    display-name-key="heatRadius_DisplayName"
-              of-type="Whole.None" usage="input" default-value="25" />
-    <property name="heatMaxZoom"   display-name-key="heatMaxZoom_DisplayName"
-              of-type="Whole.None" usage="input" default-value="17" />
-    <property name="initialLat"    display-name-key="initialLat_DisplayName"
-              of-type="Decimal" usage="input" default-value="-22.2171" />
-    <property name="initialLng"    display-name-key="initialLng_DisplayName"
-              of-type="Decimal" usage="input" default-value="-49.9501" />
-    <property name="initialZoom"   display-name-key="initialZoom_DisplayName"
-              of-type="Whole.None" usage="input" default-value="12" />
-    <property name="tileUrl"       display-name-key="tileUrl_DisplayName"
-              of-type="SingleLine.Text" usage="input" />
+    <property name="sampleProperty" display-name-key="sampleProperty_DisplayName"
+              description-key="sampleProperty_Desc"
+              of-type="SingleLine.Text" usage="bound" required="false" />
 
     <resources>
       <code path="index.ts" order="1" />
