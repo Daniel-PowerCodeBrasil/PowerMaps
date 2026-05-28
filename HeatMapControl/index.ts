@@ -1,6 +1,5 @@
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
 import * as L from "leaflet";
-import "leaflet/dist/leaflet.css";
 import "leaflet.heat";
 
 interface OccurrencePoint {
