@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="PowerMapsBR" constructor="HeatMapControl" version="1.0.8"
+  <control namespace="PowerMapsBR" constructor="HeatMapControl" version="1.0.10"
            display-name-key="HeatMapControl_DisplayName"
            description-key="HeatMapControl_Description"
-           control-type="standard">
+           control-type="virtual">
 
     <external-service-usage enabled="false" />
 
@@ -13,6 +13,7 @@
 
     <resources>
       <code path="index.ts" order="1" />
+      <platform-library name="React" version="16.14.0" />
       <resx path="strings/HeatMapControl.1033.resx" version="1.0.0" />
     </resources>
   </control>

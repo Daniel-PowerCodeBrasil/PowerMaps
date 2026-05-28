@@ -1,23 +1,36 @@
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
+import * as React from "react";
 
 export class HeatMapControl
-  implements ComponentFramework.StandardControl<IInputs, IOutputs>
+  implements ComponentFramework.ReactControl<IInputs, IOutputs>
 {
-  private _container: HTMLDivElement;
-
   init(
     context: ComponentFramework.Context<IInputs>,
     notifyOutputChanged: () => void,
-    state: ComponentFramework.Dictionary,
-    container: HTMLDivElement
+    state: ComponentFramework.Dictionary
   ): void {
-    this._container = container;
-    this._container.innerHTML =
-      '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#0078d4;color:#fff;font-family:Segoe UI,Arial,sans-serif;font-size:18px;">PowerMaps HeatMap (diagnostic)</div>';
+    void context;
   }
 
-  updateView(context: ComponentFramework.Context<IInputs>): void {
+  updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
     void context;
+    return React.createElement(
+      "div",
+      {
+        style: {
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#0078d4",
+          color: "#fff",
+          fontFamily: "Segoe UI, Arial, sans-serif",
+          fontSize: "18px",
+        },
+      },
+      "PowerMaps HeatMap (virtual diagnostic)"
+    );
   }
 
   getOutputs(): IOutputs {
