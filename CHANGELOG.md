@@ -6,6 +6,18 @@ e o versionamento segue o [SemVer](https://semver.org/lang/pt-BR/).
 
 ---
 
+## [1.2.2] — 2026-05-29
+
+### Alterado
+- **Nome do distribuidor (publisher)** passou de "PowerMaps" para **"PowerCode Brasil"**
+  — é o nome que aparece na coluna *Distribuidor* da lista de soluções. O `UniqueName`
+  (`pm`) e o prefixo de customização (`pm`) foram mantidos, então o `schemaName` do
+  controle (`pm_PowerMapsBR.HeatMapControl`) não muda.
+
+> ℹ️ Se o ambiente já tem o publisher `pm` com o nome antigo, pode ser necessário
+> **excluir a solução antiga antes de importar** a nova para o nome do distribuidor
+> ser atualizado (ou renomear o publisher manualmente em Soluções → Publicadores).
+
 ## [1.2.1] — 2026-05-29
 
 ### Adicionado

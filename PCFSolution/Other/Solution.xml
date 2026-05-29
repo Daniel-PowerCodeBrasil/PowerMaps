@@ -6,12 +6,12 @@
       <LocalizedName description="PowerMaps" languagecode="1033"/>
     </LocalizedNames>
     <Descriptions/>
-    <Version>1.2.0.0</Version>
+    <Version>1.2.2.0</Version>
     <Managed>1</Managed>
     <Publisher>
       <UniqueName>pm</UniqueName>
       <LocalizedNames>
-        <LocalizedName description="PowerMaps" languagecode="1033"/>
+        <LocalizedName description="PowerCode Brasil" languagecode="1033"/>
       </LocalizedNames>
       <Descriptions/>
       <EMailAddress/>
