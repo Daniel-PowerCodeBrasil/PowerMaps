@@ -169,7 +169,40 @@ const HeatMap: React.FC<MapProps> = (props) => {
     markerLayerRef.current = L.layerGroup().addTo(map);
     props.mapRef.current = map;
 
+    // The PCF/Canvas container is frequently sized AFTER the map is created
+    // (allocatedWidth/Height arrives as 0 on first render). Leaflet caches the
+    // viewport size at init time and only loads tiles for that area, leaving the
+    // rest of the container blank. A ResizeObserver on the real DOM element fixes
+    // this by recomputing the size whenever the container actually changes.
+    let resizeObserver: ResizeObserver | null = null;
+    let lastW = 0;
+    let lastH = 0;
+    const refresh = () => {
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      if (w > 0 && h > 0 && (w !== lastW || h !== lastH)) {
+        lastW = w;
+        lastH = h;
+        map.invalidateSize({ animate: false });
+      }
+    };
+
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(() => refresh());
+      resizeObserver.observe(el);
+    }
+
+    // Belt-and-suspenders: also nudge the map a few times after layout settles,
+    // covering browsers/hosts where the observer fires before the final size.
+    const timers = [0, 100, 300, 600, 1000].map((ms) =>
+      window.setTimeout(() => refresh(), ms)
+    );
+
     return () => {
+      timers.forEach((t) => window.clearTimeout(t));
+      if (resizeObserver) {
+        try { resizeObserver.disconnect(); } catch { /* ignore */ }
+      }
       heatLayerRef.current = null;
       markerLayerRef.current = null;
       props.mapRef.current = null;
@@ -179,9 +212,9 @@ const HeatMap: React.FC<MapProps> = (props) => {
   }, []);
 
   React.useEffect(() => {
-    if (props.mapRef.current) {
-      props.mapRef.current.invalidateSize();
-    }
+    const map = props.mapRef.current;
+    if (!map) return;
+    map.invalidateSize({ animate: false });
   }, [props.width, props.height, props.mapRef]);
 
   React.useEffect(() => {
@@ -239,12 +272,22 @@ const HeatMap: React.FC<MapProps> = (props) => {
     overflow: "hidden",
   };
 
+  const mapStyle: React.CSSProperties = {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: "100%",
+    height: "100%",
+  };
+
   return React.createElement(
     "div",
     { style: wrapperStyle },
     React.createElement("div", {
       ref: containerRef,
-      style: { width: "100%", height: "100%" },
+      style: mapStyle,
     })
   );
 };
