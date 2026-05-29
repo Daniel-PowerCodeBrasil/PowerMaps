@@ -33,11 +33,11 @@ const INJECTED_CSS = `
 .leaflet-container.leaflet-touch-zoom{-ms-touch-action:pan-x pan-y;touch-action:pan-x pan-y}
 .leaflet-container.leaflet-touch-drag{-ms-touch-action:pinch-zoom;touch-action:none;touch-action:pinch-zoom}
 .leaflet-container.leaflet-touch-drag.leaflet-touch-zoom{-ms-touch-action:none;touch-action:none}
-.leaflet-container{-webkit-tap-highlight-color:transparent}
-.leaflet-container a{-webkit-tap-highlight-color:rgba(51,181,229,.4)}
+.leaflet-container{-webkit-tap-highlight-color:transparent;background:#ddd;outline-offset:1px;font-family:"Helvetica Neue",Arial,Helvetica,sans-serif;font-size:12px;line-height:1.5}
+.leaflet-container a{-webkit-tap-highlight-color:rgba(51,181,229,.4);color:#0078A8}
 .leaflet-tile{filter:inherit;visibility:hidden}
 .leaflet-tile-loaded{visibility:inherit}
-.leaflet-zoom-box{width:0;height:0;-moz-box-sizing:border-box;box-sizing:border-box;z-index:800}
+.leaflet-zoom-box{width:0;height:0;box-sizing:border-box;z-index:800}
 .leaflet-overlay-pane svg{-moz-user-select:none}
 .leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-shadow-pane{z-index:500}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}
 .leaflet-map-pane canvas{z-index:100}.leaflet-map-pane svg{z-index:200}
@@ -60,8 +60,6 @@ svg.leaflet-zoom-animated{will-change:transform}
 .leaflet-dragging .leaflet-grab,.leaflet-dragging .leaflet-grab .leaflet-interactive,.leaflet-dragging .leaflet-marker-draggable{cursor:grabbing}
 .leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-image-layer,.leaflet-pane>svg path,.leaflet-tile-container{pointer-events:none}
 .leaflet-marker-icon.leaflet-interactive,.leaflet-image-layer.leaflet-interactive,.leaflet-pane>svg path.leaflet-interactive,svg.leaflet-image-layer.leaflet-interactive path{pointer-events:visiblePainted;pointer-events:auto}
-.leaflet-container{background:#ddd;outline-offset:1px;font-family:"Helvetica Neue",Arial,Helvetica,sans-serif;font-size:12px;line-height:1.5}
-.leaflet-container a{color:#0078A8}
 .leaflet-zoom-box{border:2px dotted #38f;background:rgba(255,255,255,.5)}
 .leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px}
 .leaflet-bar a{background-color:#fff;border-bottom:1px solid #ccc;width:26px;height:26px;line-height:26px;display:block;text-align:center;text-decoration:none;color:#000}
@@ -72,9 +70,6 @@ svg.leaflet-zoom-animated{will-change:transform}
 .leaflet-touch .leaflet-bar a{width:30px;height:30px;line-height:30px}
 .leaflet-control-zoom-in,.leaflet-control-zoom-out{font:bold 18px 'Lucida Console',Monaco,monospace;text-indent:1px}
 .leaflet-touch .leaflet-control-zoom-in,.leaflet-touch .leaflet-control-zoom-out{font-size:22px}
-.leaflet-container .leaflet-control-attribution{background:#fff;background:rgba(255,255,255,.8);margin:0;font-size:10px;padding:0 5px;color:#333;line-height:1.4}
-.leaflet-control-attribution a{text-decoration:none}
-.leaflet-control-attribution a:hover{text-decoration:underline}
 .leaflet-popup{position:absolute;text-align:center;margin-bottom:20px}
 .leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:12px}
 .leaflet-popup-content{margin:13px 24px 13px 20px;line-height:1.3;font-size:13px;min-height:1px}
@@ -132,11 +127,11 @@ interface MapProps {
   tileUrl: string;
   width: number;
   height: number;
+  mapRef: React.MutableRefObject<L.Map | null>;
 }
 
 const HeatMap: React.FC<MapProps> = (props) => {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
-  const mapRef = React.useRef<L.Map | null>(null);
   const heatLayerRef = React.useRef<L.HeatLayer | null>(null);
   const markerLayerRef = React.useRef<L.LayerGroup | null>(null);
 
@@ -145,65 +140,75 @@ const HeatMap: React.FC<MapProps> = (props) => {
   }, []);
 
   React.useEffect(() => {
-    if (!containerRef.current || mapRef.current) return;
+    const el = containerRef.current;
+    if (!el) return;
 
-    const tileUrl = props.tileUrl || DEFAULT_TILE_URL;
-    const map = L.map(containerRef.current, {
-      center: [props.initialLat, props.initialLng],
-      zoom: props.initialZoom,
-    });
-
-    L.tileLayer(tileUrl, {
-      attribution:
-        tileUrl === DEFAULT_TILE_URL
-          ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          : "",
-      maxZoom: 19,
-    }).addTo(map);
-
-    markerLayerRef.current = L.layerGroup().addTo(map);
-    mapRef.current = map;
-
-    return () => {
-      map.remove();
-      mapRef.current = null;
+    // Remove any leftover Leaflet state from a previous mount on this element
+    const anyEl = el as any;
+    if (anyEl._leaflet_id) {
+      try { props.mapRef.current?.remove(); } catch { /* ignore */ }
+      props.mapRef.current = null;
       heatLayerRef.current = null;
       markerLayerRef.current = null;
+      delete anyEl._leaflet_id;
+    }
+
+    let map: L.Map;
+    try {
+      map = L.map(el, {
+        center: [props.initialLat, props.initialLng],
+        zoom: props.initialZoom,
+        attributionControl: false,
+        preferCanvas: true,
+      });
+    } catch (e) {
+      return;
+    }
+
+    L.tileLayer(props.tileUrl || DEFAULT_TILE_URL, { maxZoom: 19 }).addTo(map);
+    markerLayerRef.current = L.layerGroup().addTo(map);
+    props.mapRef.current = map;
+
+    return () => {
+      heatLayerRef.current = null;
+      markerLayerRef.current = null;
+      props.mapRef.current = null;
+      try { map.remove(); } catch { /* ignore */ }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   React.useEffect(() => {
-    if (mapRef.current) {
-      mapRef.current.invalidateSize();
+    if (props.mapRef.current) {
+      props.mapRef.current.invalidateSize();
     }
-  }, [props.width, props.height]);
+  }, [props.width, props.height, props.mapRef]);
 
   React.useEffect(() => {
-    const map = mapRef.current;
+    const map = props.mapRef.current;
     if (!map) return;
 
     if (props.enableHeatmap) {
       if (markerLayerRef.current) markerLayerRef.current.clearLayers();
-      const latlngs: L.HeatLatLngTuple[] = props.points.map((p) => [
-        p.lat,
-        p.lng,
-        p.weight,
-      ]);
       if (heatLayerRef.current) {
-        map.removeLayer(heatLayerRef.current);
+        try { map.removeLayer(heatLayerRef.current); } catch { /* ignore */ }
+        heatLayerRef.current = null;
       }
-      heatLayerRef.current = L.heatLayer(latlngs, {
-        radius: props.heatRadius,
-        maxZoom: props.heatMaxZoom,
-        blur: props.heatBlur,
-        max: Math.max(1, props.heatIntensity),
-        minOpacity: 0.4,
-        gradient: HEAT_GRADIENT,
-      });
-      heatLayerRef.current.addTo(map);
+      const latlngs: L.HeatLatLngTuple[] = props.points.map((p) => [p.lat, p.lng, p.weight]);
+      try {
+        heatLayerRef.current = L.heatLayer(latlngs, {
+          radius: props.heatRadius,
+          maxZoom: props.heatMaxZoom,
+          blur: props.heatBlur,
+          max: Math.max(1, props.heatIntensity),
+          minOpacity: 0.4,
+          gradient: HEAT_GRADIENT,
+        });
+        heatLayerRef.current.addTo(map);
+      } catch { /* ignore */ }
     } else {
       if (heatLayerRef.current) {
-        map.removeLayer(heatLayerRef.current);
+        try { map.removeLayer(heatLayerRef.current); } catch { /* ignore */ }
         heatLayerRef.current = null;
       }
       if (!markerLayerRef.current) {
@@ -212,25 +217,20 @@ const HeatMap: React.FC<MapProps> = (props) => {
         markerLayerRef.current.clearLayers();
       }
       for (const pt of props.points) {
-        const m = L.circleMarker([pt.lat, pt.lng], {
-          color: "#C8185A",
-          fillColor: "#C8185A",
-          fillOpacity: 0.7,
-          radius: 7,
-          weight: 1,
-        });
-        if (pt.label) m.bindPopup(pt.label);
-        m.addTo(markerLayerRef.current);
+        try {
+          const m = L.circleMarker([pt.lat, pt.lng], {
+            color: "#C8185A",
+            fillColor: "#C8185A",
+            fillOpacity: 0.7,
+            radius: 7,
+            weight: 1,
+          });
+          if (pt.label) m.bindPopup(pt.label);
+          m.addTo(markerLayerRef.current);
+        } catch { /* ignore */ }
       }
     }
-  }, [
-    props.points,
-    props.enableHeatmap,
-    props.heatRadius,
-    props.heatBlur,
-    props.heatIntensity,
-    props.heatMaxZoom,
-  ]);
+  }, [props.points, props.enableHeatmap, props.heatRadius, props.heatBlur, props.heatIntensity, props.heatMaxZoom, props.mapRef]);
 
   const wrapperStyle: React.CSSProperties = {
     width: props.width > 0 ? props.width + "px" : "100%",
@@ -251,6 +251,8 @@ const HeatMap: React.FC<MapProps> = (props) => {
 export class HeatMapControl
   implements ComponentFramework.ReactControl<IInputs, IOutputs>
 {
+  private _mapRef: React.MutableRefObject<L.Map | null> = { current: null };
+
   init(
     context: ComponentFramework.Context<IInputs>,
     notifyOutputChanged: () => void,
@@ -259,9 +261,7 @@ export class HeatMapControl
     void context;
   }
 
-  updateView(
-    context: ComponentFramework.Context<IInputs>
-  ): React.ReactElement {
+  updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
     const props = context.parameters;
     return React.createElement(HeatMap, {
       points: parsePoints(props.occurrencesJson.raw),
@@ -276,6 +276,7 @@ export class HeatMapControl
       tileUrl: (props.tileUrl.raw as string | null) ?? "",
       width: context.mode.allocatedWidth,
       height: context.mode.allocatedHeight,
+      mapRef: this._mapRef,
     });
   }
 
@@ -284,6 +285,9 @@ export class HeatMapControl
   }
 
   destroy(): void {
-    /* React handles cleanup */
+    if (this._mapRef.current) {
+      try { this._mapRef.current.remove(); } catch { /* ignore */ }
+      this._mapRef.current = null;
+    }
   }
 }
