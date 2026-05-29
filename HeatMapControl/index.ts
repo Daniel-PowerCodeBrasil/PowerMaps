@@ -9,6 +9,7 @@ interface OccurrencePoint {
   weight: number;
   label: string;
   count: number;
+  labels: string[]; // all individual labels collected at this centroid
 }
 
 const DEFAULT_TILE_URL =
@@ -122,6 +123,13 @@ svg.leaflet-zoom-animated{will-change:transform}
 .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#fff;color:#333;box-shadow:0 3px 14px rgba(0,0,0,.4)}
 .leaflet-container a.leaflet-popup-close-button{position:absolute;top:0;right:0;border:none;text-align:center;width:24px;height:24px;font:16px/24px Tahoma,Verdana,sans-serif;color:#757575;text-decoration:none;background:transparent}
 .leaflet-popup-scrolled{overflow:auto}
+.pm-divicon{background:transparent!important;border:none!important;box-shadow:none!important}
+.pm-heat-badge{background:rgba(15,15,15,.72);color:#fff;border:2px solid rgba(255,255,255,.88);border-radius:20px;min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;font:700 11px/1 "Helvetica Neue",Arial,sans-serif;padding:0 5px;box-sizing:border-box;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,.45);pointer-events:auto;white-space:nowrap;transform:translate(-50%,-50%)}
+.pm-pop-title{font-weight:700;font-size:13px;margin:0 0 3px}
+.pm-pop-count{color:#888;font-size:11px;margin:0 0 4px}
+.pm-pop-list{margin:4px 0 0;padding:0 0 0 16px;font-size:12px;max-height:120px;overflow-y:auto}
+.pm-pop-list li{margin-bottom:2px;line-height:1.4}
+.pm-pop-more{color:#aaa;font-size:11px;margin-top:4px}
 `;
 
 function injectStyles(): void {
@@ -247,11 +255,33 @@ function parsePoints(raw: string | null, places: PlaceTable): OccurrencePoint[] 
       existing.weight += weight;
       existing.count += 1;
       if (!existing.label && label) existing.label = label;
+      if (label) existing.labels.push(label);
     } else {
-      agg.set(key, { lat, lng, weight, label, count: 1 });
+      agg.set(key, { lat, lng, weight, label, count: 1, labels: label ? [label] : [] });
     }
   }
   return Array.from(agg.values());
+}
+
+function esc(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function buildPopup(pt: OccurrencePoint): string {
+  const title = pt.label || "Local";
+  const countLine = pt.count > 1
+    ? `<div class="pm-pop-count">${pt.count} ocorr&ecirc;ncias</div>`
+    : "";
+  const MAX = 8;
+  const unique = Array.from(new Set(pt.labels.filter(Boolean)));
+  const shown = unique.slice(0, MAX);
+  const rest = unique.length - shown.length;
+  const listHtml = shown.map((l) => `<li>${esc(l)}</li>`).join("");
+  const moreHtml = rest > 0 ? `<div class="pm-pop-more">+ ${rest} mais</div>` : "";
+  const list = shown.length > 0
+    ? `<ul class="pm-pop-list">${listHtml}</ul>${moreHtml}`
+    : "";
+  return `<div class="pm-pop-title">${esc(title)}</div>${countLine}${list}`;
 }
 
 interface MapProps {
@@ -274,6 +304,7 @@ const HeatMap: React.FC<MapProps> = (props) => {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const heatLayerRef = React.useRef<L.HeatLayer | null>(null);
   const markerLayerRef = React.useRef<L.LayerGroup | null>(null);
+  const labelLayerRef = React.useRef<L.LayerGroup | null>(null);
 
   React.useEffect(() => {
     injectStyles();
@@ -290,6 +321,7 @@ const HeatMap: React.FC<MapProps> = (props) => {
       props.mapRef.current = null;
       heatLayerRef.current = null;
       markerLayerRef.current = null;
+      labelLayerRef.current = null;
       delete anyEl._leaflet_id;
     }
 
@@ -307,6 +339,7 @@ const HeatMap: React.FC<MapProps> = (props) => {
 
     L.tileLayer(props.tileUrl || DEFAULT_TILE_URL, { maxZoom: 19 }).addTo(map);
     markerLayerRef.current = L.layerGroup().addTo(map);
+    labelLayerRef.current = L.layerGroup().addTo(map);
     props.mapRef.current = map;
 
     // The PCF/Canvas container is frequently sized AFTER the map is created
@@ -345,6 +378,7 @@ const HeatMap: React.FC<MapProps> = (props) => {
       }
       heatLayerRef.current = null;
       markerLayerRef.current = null;
+      labelLayerRef.current = null;
       props.mapRef.current = null;
       try { map.remove(); } catch { /* ignore */ }
     };
@@ -363,6 +397,8 @@ const HeatMap: React.FC<MapProps> = (props) => {
 
     if (props.enableHeatmap) {
       if (markerLayerRef.current) markerLayerRef.current.clearLayers();
+
+      // Heatmap canvas layer
       if (heatLayerRef.current) {
         try { map.removeLayer(heatLayerRef.current); } catch { /* ignore */ }
         heatLayerRef.current = null;
@@ -379,11 +415,34 @@ const HeatMap: React.FC<MapProps> = (props) => {
         });
         heatLayerRef.current.addTo(map);
       } catch { /* ignore */ }
+
+      // Count badges + click popups floating above each centroid
+      if (labelLayerRef.current) {
+        labelLayerRef.current.clearLayers();
+        for (const pt of props.points) {
+          try {
+            const displayCount = pt.count > 999 ? "999+" : String(pt.count);
+            const icon = L.divIcon({
+              className: "pm-divicon",
+              html: `<div class="pm-heat-badge">${displayCount}</div>`,
+              iconSize: [0, 0],
+              iconAnchor: [0, 0],
+              popupAnchor: [0, -14],
+            });
+            L.marker([pt.lat, pt.lng], { icon, interactive: true, zIndexOffset: 500 })
+              .bindPopup(buildPopup(pt), { maxWidth: 260, minWidth: 140 })
+              .addTo(labelLayerRef.current!);
+          } catch { /* ignore */ }
+        }
+      }
     } else {
+      // Marker mode: remove heat + labels, show circle markers
       if (heatLayerRef.current) {
         try { map.removeLayer(heatLayerRef.current); } catch { /* ignore */ }
         heatLayerRef.current = null;
       }
+      if (labelLayerRef.current) labelLayerRef.current.clearLayers();
+
       if (!markerLayerRef.current) {
         markerLayerRef.current = L.layerGroup().addTo(map);
       } else {
@@ -395,15 +454,10 @@ const HeatMap: React.FC<MapProps> = (props) => {
             color: "#C8185A",
             fillColor: "#C8185A",
             fillOpacity: 0.7,
-            // Pontos agregados (várias ocorrências no mesmo local) ganham um
-            // raio um pouco maior, para dar uma noção visual de volume.
             radius: pt.count > 1 ? Math.min(7 + pt.count, 18) : 7,
             weight: 1,
           });
-          const base = pt.label || "Local";
-          const popup =
-            pt.count > 1 ? `${base}: ${pt.count} ocorrências` : base;
-          m.bindPopup(popup);
+          m.bindPopup(buildPopup(pt), { maxWidth: 260, minWidth: 140 });
           m.addTo(markerLayerRef.current);
         } catch { /* ignore */ }
       }

@@ -6,6 +6,17 @@ e o versionamento segue o [SemVer](https://semver.org/lang/pt-BR/).
 
 ---
 
+## [1.2.1] — 2026-05-29
+
+### Adicionado
+- **Badge com contagem** flutuando sobre cada centroide no modo mapa de calor. Um
+  círculo escuro com o número de ocorrências aparece sobre o ponto quente.
+- **Popup com detalhes ao clicar**: disponível em ambos os modos. Mostra o nome
+  do local, o total de ocorrências e a lista de rótulos individuais (até 8,
+  com "+ N mais" se houver excesso). Rótulos repetidos são deduplicados.
+- No modo marcadores, o raio do círculo continua variando por volume, e o popup
+  agora usa o mesmo formato rico do modo calor.
+
 ## [1.2.0] — 2026-05-29
 
 ### Adicionado
