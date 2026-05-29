@@ -38,16 +38,22 @@
   <resheader name="version">
     <value>2.0</value>
   </resheader>
-  <data name="HeatMapControl_DisplayName" xml:space="preserve">
-    <value>PowerMaps HeatMap</value>
-  </data>
-  <data name="HeatMapControl_Description" xml:space="preserve">
-    <value>Heat map control diagnostic build.</value>
-  </data>
-  <data name="sampleProperty_DisplayName" xml:space="preserve">
-    <value>Sample Property</value>
-  </data>
-  <data name="sampleProperty_Desc" xml:space="preserve">
-    <value>Sample bound property.</value>
-  </data>
+  <data name="HeatMapControl_DisplayName" xml:space="preserve"><value>Mapa de Calor</value></data>
+  <data name="HeatMapControl_Description" xml:space="preserve"><value>Exibe ocorrências geolocalizadas como mapa de calor ou marcadores num mapa interativo.</value></data>
+  <data name="occurrencesJson_DisplayName" xml:space="preserve"><value>Ocorrências (JSON)</value></data>
+  <data name="occurrencesJson_Desc" xml:space="preserve"><value>Array JSON: [{"lat":-22.2,"lng":-49.9,"weight":1,"label":"..."}, ...]</value></data>
+  <data name="enableHeatmap_DisplayName" xml:space="preserve"><value>Ativar Mapa de Calor</value></data>
+  <data name="enableHeatmap_Desc" xml:space="preserve"><value>Quando ativo, exibe heatmap. Quando inativo, exibe marcadores.</value></data>
+  <data name="heatRadius_DisplayName" xml:space="preserve"><value>Raio do Calor</value></data>
+  <data name="heatRadius_Desc" xml:space="preserve"><value>Raio em pixels de cada ponto do heatmap.</value></data>
+  <data name="heatMaxZoom_DisplayName" xml:space="preserve"><value>Zoom de Intensidade Máxima</value></data>
+  <data name="heatMaxZoom_Desc" xml:space="preserve"><value>Nível de zoom em que o heatmap atinge intensidade máxima.</value></data>
+  <data name="initialLat_DisplayName" xml:space="preserve"><value>Latitude Inicial</value></data>
+  <data name="initialLat_Desc" xml:space="preserve"><value>Latitude central inicial do mapa.</value></data>
+  <data name="initialLng_DisplayName" xml:space="preserve"><value>Longitude Inicial</value></data>
+  <data name="initialLng_Desc" xml:space="preserve"><value>Longitude central inicial do mapa.</value></data>
+  <data name="initialZoom_DisplayName" xml:space="preserve"><value>Zoom Inicial</value></data>
+  <data name="initialZoom_Desc" xml:space="preserve"><value>Nível de zoom inicial do mapa.</value></data>
+  <data name="tileUrl_DisplayName" xml:space="preserve"><value>URL dos Tiles</value></data>
+  <data name="tileUrl_Desc" xml:space="preserve"><value>URL do servidor de tiles. Vazio = OpenStreetMap padrão.</value></data>
 </root>

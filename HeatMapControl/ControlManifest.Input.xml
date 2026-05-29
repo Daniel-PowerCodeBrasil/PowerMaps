@@ -1,15 +1,43 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="PowerMapsBR" constructor="HeatMapControl" version="1.0.10"
+  <control namespace="PowerMapsBR" constructor="HeatMapControl" version="1.1.0"
            display-name-key="HeatMapControl_DisplayName"
            description-key="HeatMapControl_Description"
            control-type="virtual">
 
     <external-service-usage enabled="false" />
 
-    <property name="sampleProperty" display-name-key="sampleProperty_DisplayName"
-              description-key="sampleProperty_Desc"
-              of-type="SingleLine.Text" usage="bound" required="false" />
+    <property name="occurrencesJson" display-name-key="occurrencesJson_DisplayName"
+              description-key="occurrencesJson_Desc"
+              of-type="Multiple" usage="input" required="false" />
+
+    <property name="enableHeatmap" display-name-key="enableHeatmap_DisplayName"
+              description-key="enableHeatmap_Desc"
+              of-type="TwoOptions" usage="input" required="false" default-value="true" />
+
+    <property name="heatRadius" display-name-key="heatRadius_DisplayName"
+              description-key="heatRadius_Desc"
+              of-type="Whole.None" usage="input" required="false" default-value="25" />
+
+    <property name="heatMaxZoom" display-name-key="heatMaxZoom_DisplayName"
+              description-key="heatMaxZoom_Desc"
+              of-type="Whole.None" usage="input" required="false" default-value="17" />
+
+    <property name="initialLat" display-name-key="initialLat_DisplayName"
+              description-key="initialLat_Desc"
+              of-type="Decimal" usage="input" required="false" default-value="-22.2171" />
+
+    <property name="initialLng" display-name-key="initialLng_DisplayName"
+              description-key="initialLng_Desc"
+              of-type="Decimal" usage="input" required="false" default-value="-49.9501" />
+
+    <property name="initialZoom" display-name-key="initialZoom_DisplayName"
+              description-key="initialZoom_Desc"
+              of-type="Whole.None" usage="input" required="false" default-value="12" />
+
+    <property name="tileUrl" display-name-key="tileUrl_DisplayName"
+              description-key="tileUrl_Desc"
+              of-type="SingleLine.Text" usage="input" required="false" />
 
     <resources>
       <code path="index.ts" order="1" />
