@@ -13,10 +13,12 @@ interface OccurrencePoint {
 const DEFAULT_TILE_URL =
   "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 const HEAT_GRADIENT: { [key: number]: string } = {
-  0.2: "#3B8BD4",
-  0.5: "#63D471",
-  0.7: "#F2A623",
-  1.0: "#E8593C",
+  0.1: "#FFEDA0",
+  0.3: "#FEB24C",
+  0.5: "#FD8D3C",
+  0.7: "#FC4E2A",
+  0.85: "#E31A1C",
+  1.0: "#B10026",
 };
 
 const STYLE_ID = "pm-heatmap-styles";
@@ -121,6 +123,8 @@ interface MapProps {
   points: OccurrencePoint[];
   enableHeatmap: boolean;
   heatRadius: number;
+  heatBlur: number;
+  heatIntensity: number;
   heatMaxZoom: number;
   initialLat: number;
   initialLng: number;
@@ -186,16 +190,17 @@ const HeatMap: React.FC<MapProps> = (props) => {
         p.weight,
       ]);
       if (heatLayerRef.current) {
-        heatLayerRef.current.setLatLngs(latlngs);
-      } else {
-        heatLayerRef.current = L.heatLayer(latlngs, {
-          radius: props.heatRadius,
-          maxZoom: props.heatMaxZoom,
-          blur: 15,
-          gradient: HEAT_GRADIENT,
-        });
-        heatLayerRef.current.addTo(map);
+        map.removeLayer(heatLayerRef.current);
       }
+      heatLayerRef.current = L.heatLayer(latlngs, {
+        radius: props.heatRadius,
+        maxZoom: props.heatMaxZoom,
+        blur: props.heatBlur,
+        max: Math.max(1, props.heatIntensity),
+        minOpacity: 0.4,
+        gradient: HEAT_GRADIENT,
+      });
+      heatLayerRef.current.addTo(map);
     } else {
       if (heatLayerRef.current) {
         map.removeLayer(heatLayerRef.current);
@@ -222,6 +227,8 @@ const HeatMap: React.FC<MapProps> = (props) => {
     props.points,
     props.enableHeatmap,
     props.heatRadius,
+    props.heatBlur,
+    props.heatIntensity,
     props.heatMaxZoom,
   ]);
 
@@ -259,7 +266,9 @@ export class HeatMapControl
     return React.createElement(HeatMap, {
       points: parsePoints(props.occurrencesJson.raw),
       enableHeatmap: props.enableHeatmap.raw ?? true,
-      heatRadius: (props.heatRadius.raw as number) ?? 25,
+      heatRadius: (props.heatRadius.raw as number) ?? 50,
+      heatBlur: (props.heatBlur.raw as number) ?? 25,
+      heatIntensity: (props.heatIntensity.raw as number) ?? 3,
       heatMaxZoom: (props.heatMaxZoom.raw as number) ?? 17,
       initialLat: (props.initialLat.raw as number) ?? -22.2171,
       initialLng: (props.initialLng.raw as number) ?? -49.9501,

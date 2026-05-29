@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="PowerMapsBR" constructor="HeatMapControl" version="1.1.0"
+  <control namespace="PowerMapsBR" constructor="HeatMapControl" version="1.1.1"
            display-name-key="HeatMapControl_DisplayName"
            description-key="HeatMapControl_Description"
            control-type="virtual">
@@ -17,7 +17,15 @@
 
     <property name="heatRadius" display-name-key="heatRadius_DisplayName"
               description-key="heatRadius_Desc"
+              of-type="Whole.None" usage="input" required="false" default-value="50" />
+
+    <property name="heatBlur" display-name-key="heatBlur_DisplayName"
+              description-key="heatBlur_Desc"
               of-type="Whole.None" usage="input" required="false" default-value="25" />
+
+    <property name="heatIntensity" display-name-key="heatIntensity_DisplayName"
+              description-key="heatIntensity_Desc"
+              of-type="Whole.None" usage="input" required="false" default-value="3" />
 
     <property name="heatMaxZoom" display-name-key="heatMaxZoom_DisplayName"
               description-key="heatMaxZoom_Desc"
