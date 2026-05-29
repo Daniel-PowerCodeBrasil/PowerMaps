@@ -52,54 +52,60 @@ A partir da **v1.2.0**, uma ocorrência pode ser localizada **por nome**, sem
 coordenadas. O componente resolve a posição na seguinte ordem:
 
 1. `lat`/`lng` (se existirem, sempre vencem — é o mais preciso)
-2. `cidade` + `bairro`
-3. `bairro`
-4. `cidade`
-5. `uf` / `estado`
+2. `placesJson` (tabela do usuário): `cidade`+`bairro` → `bairro` → `cidade`
+3. `cidade` → **base embutida dos 5.570 municípios do Brasil (IBGE)**
+4. `uf` / `estado`
 
 Os nomes são comparados **sem acento e sem diferença de maiúsculas** (`"São Paulo"`
 = `"sao paulo"`).
 
-### Estados do Brasil: funcionam de graça 🇧🇷
+### Estados e cidades: funcionam de graça 🇧🇷
 
-Os centroides dos **27 estados** já vêm embutidos. Basta a ocorrência ter `uf` ou
-`estado`:
+A partir da **v1.3.0**, tanto os **27 estados** quanto os **5.570 municípios** do
+Brasil já vêm embutidos. Basta a ocorrência ter `cidade`, `uf` ou `estado` — **sem
+precisar de `placesJson`**:
 
 ```json
 [
-  { "uf": "SP" },
+  { "cidade": "Marília", "label": "Furto" },
+  { "cidade": "Marília", "label": "Roubo" },
+  { "cidade": "Bauru" },
   { "estado": "Rio de Janeiro", "weight": 3 },
-  { "uf": "MG", "label": "Belo Horizonte" }
+  { "uf": "SP" }
 ]
 ```
 
+No exemplo acima, as duas ocorrências de Marília são **agregadas** no centroide da
+cidade (badge "2"). Cidade resolve sozinha; o estado vira um ponto no centro
+geográfico dele.
+
+> 🏙️ **Homônimos** (cidades com mesmo nome em estados diferentes): informe o `uf`
+> junto para desambiguar (`{"cidade":"Bom Jesus","uf":"PI"}`). Sem `uf`, o
+> componente prefere a **capital** de mesmo nome; senão, a primeira correspondência.
+
 > ⚠️ Estado vira um **único ponto no centro geográfico** do estado (calor por
-> centroide). Ótimo para um panorama nacional; para detalhe dentro de uma cidade,
-> use bairro.
+> centroide). Ótimo para um panorama nacional; para detalhe, use cidade ou bairro.
 
-### Cidades e bairros: você fornece a tabela (`placesJson`)
+### Bairros: a precisão fina vem da `placesJson`
 
-Como os centroides de cidade/bairro mudam de projeto pra projeto, eles vêm de uma
-**tabela de referência** que você passa na propriedade `placesJson`:
+A base embutida vai até o nível de **cidade**. Bairro não tem uma base nacional
+prática, então:
 
-```powerfx
-// placesJson
-"[{""cidade"":""Bauru"",""bairro"":""Centro"",""lat"":-22.3147,""lng"":-49.0606},{""cidade"":""Bauru"",""bairro"":""Vila Nova"",""lat"":-22.3220,""lng"":-49.0710},{""cidade"":""Marília"",""lat"":-22.2171,""lng"":-49.9501}]"
-```
-
-E aí as ocorrências referenciam só pelos nomes:
+- Se você **não** fornece `placesJson`, ocorrências com `bairro` caem no **centroide
+  da cidade** (todas as de uma cidade se agrupam no centro dela).
+- Para separar **por bairro**, forneça a tabela `placesJson` com os centroides dos
+  bairros:
 
 ```powerfx
-// occurrencesJson
-"[{""cidade"":""Bauru"",""bairro"":""Centro""},{""cidade"":""Bauru"",""bairro"":""Centro""},{""cidade"":""Marília""}]"
+// placesJson — só necessário para granularidade por BAIRRO
+"[{""cidade"":""Bauru"",""bairro"":""Centro"",""lat"":-22.3147,""lng"":-49.0606},{""cidade"":""Bauru"",""bairro"":""Vila Nova"",""lat"":-22.3220,""lng"":-49.0710}]"
 ```
 
-No exemplo acima, as duas ocorrências do Centro de Bauru são **agregadas** num só
-ponto (peso somado = 2). No modo marcadores, o popup mostra *"Centro: 2 ocorrências"*.
+A `placesJson` tem **prioridade** sobre a base embutida — útil também se você quiser
+ajustar o ponto de uma cidade específica.
 
-> 💡 **De onde tiro os centroides?** Monte a tabela uma vez (planilha, tabela do
-> Dataverse, etc.). Para cidades, o centro aproximado já resolve bem o calor; para
-> bairros, use o centro do bairro.
+> 💡 **De onde tiro os centroides de bairro?** Monte a tabela uma vez (planilha,
+> tabela do Dataverse, etc.) usando o centro aproximado de cada bairro.
 
 ### Misturando tudo
 

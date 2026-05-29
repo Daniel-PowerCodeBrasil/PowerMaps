@@ -6,6 +6,32 @@ e o versionamento segue o [SemVer](https://semver.org/lang/pt-BR/).
 
 ---
 
+## [1.3.0] — 2026-05-29
+
+### Adicionado
+- **Cidades agora funcionam sem `placesJson`!** O componente passou a embutir a base
+  com os **5.570 municípios do Brasil** (centroides do IBGE). Uma ocorrência com
+  `"cidade":"Marília"` (com ou sem `uf`) é resolvida automaticamente — não precisa
+  mais montar a tabela de coordenadas à mão para cidades.
+- **Desambiguação de homônimos**: cidades com o mesmo nome em estados diferentes são
+  resolvidas pela chave `uf/cidade` quando você informa o estado. Sem `uf`, o
+  componente prefere a **capital** de mesmo nome; senão, a primeira correspondência.
+- `estado` por extenso (ex.: `"São Paulo"`) agora também é aceito para montar a
+  busca de cidade (convertido internamente para a sigla).
+
+### Alterado
+- Nova ordem de resolução: `lat/lng` → `placesJson` (cidade/bairro) → **base de
+  municípios** → centroide do estado.
+- **Bairro sem coordenada** na `placesJson` agora "cai" para o **centroide da
+  cidade** (antes era ignorado). Ou seja: informando `cidade`+`bairro` sem
+  `placesJson`, todas as ocorrências da cidade se agrupam no centro dela. Para
+  separar por bairro, continue usando a `placesJson`.
+
+### Notas
+- O `bundle.js` cresceu (~370 KB) por causa da base de municípios embutida. É
+  esperado e aceitável para um componente de mapa; o webpack emite um aviso de
+  tamanho que **não** é erro.
+
 ## [1.2.2] — 2026-05-29
 
 ### Alterado

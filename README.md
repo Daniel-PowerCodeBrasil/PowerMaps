@@ -73,7 +73,7 @@ HeatMapControl1.Height = Parent.Height
 | Propriedade | Tipo | Padrão | O que faz |
 |---|---|---|---|
 | `occurrencesJson` | `Multiple` (texto) | — | Array JSON com os pontos. Aceita `lat`/`lng` **ou** nomes (`uf`/`estado`, `cidade`, `bairro`). Veja o formato abaixo. |
-| `placesJson` | `Multiple` (texto) | — | Tabela opcional `cidade`/`bairro` → coordenadas, para resolver ocorrências sem `lat`/`lng`. Estados do Brasil já são reconhecidos sem isso. |
+| `placesJson` | `Multiple` (texto) | — | Tabela opcional `cidade`/`bairro` → coordenadas, **só necessária para granularidade por bairro**. Estados **e os 5.570 municípios** do Brasil já são reconhecidos sem isso. |
 | `enableHeatmap` | `TwoOptions` | `true` | `true` = mapa de calor · `false` = marcadores |
 | `heatRadius` | `Whole.None` | `50` | Raio (px) do halo de cada ponto. Maior = manchas maiores |
 | `heatBlur` | `Whole.None` | `25` | Suavização das bordas. Maior = mais difuso |
@@ -96,8 +96,9 @@ HeatMapControl1.Height = Parent.Height
 |---|---|---|
 | `lat` / `latitude` | ⬦ | Aceita os dois nomes. Opcional se informar nome |
 | `lng` / `longitude` | ⬦ | Aceita os dois nomes. Opcional se informar nome |
-| `uf` / `estado` | ⬦ | Sigla ou nome do estado — resolvido pela tabela embutida (27 UFs) |
-| `cidade` / `bairro` | ⬦ | Resolvidos pela `placesJson` |
+| `uf` / `estado` | ⬦ | Sigla ou nome do estado — resolvido pela base embutida (27 UFs) |
+| `cidade` | ⬦ | Resolvida pela base embutida dos 5.570 municípios (IBGE) |
+| `bairro` | ⬦ | Resolvido pela `placesJson`; sem ela, cai no centroide da cidade |
 | `weight` | ❌ | Peso do ponto no calor (padrão `1`) |
 | `label` | ❌ | Texto do popup no modo marcadores |
 

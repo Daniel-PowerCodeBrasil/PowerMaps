@@ -2,6 +2,7 @@ import { IInputs, IOutputs } from "./generated/ManifestTypes";
 import * as React from "react";
 import * as L from "leaflet";
 import "leaflet.heat";
+import { BR_MUNICIPALITIES, BR_CAPITALS } from "./brMunicipalities";
 
 interface OccurrencePoint {
   lat: number;
@@ -47,6 +48,26 @@ const BR_STATE_CENTROIDS: { [key: string]: [number, number] } = {
   se: [-10.6, -37.4], sergipe: [-10.6, -37.4],
   to: [-10.2, -48.3], tocantins: [-10.2, -48.3],
 };
+
+// Nome do estado por extenso (normalizado) -> sigla. Usado para montar a chave
+// "uf/cidade" da base de municípios quando o usuário informa `estado` por extenso.
+const UF_NAME_TO_CODE: { [name: string]: string } = {
+  acre: "ac", alagoas: "al", amapa: "ap", amazonas: "am", bahia: "ba",
+  ceara: "ce", "distrito federal": "df", "espirito santo": "es", goias: "go",
+  maranhao: "ma", "mato grosso": "mt", "mato grosso do sul": "ms",
+  "minas gerais": "mg", para: "pa", paraiba: "pb", parana: "pr",
+  pernambuco: "pe", piaui: "pi", "rio de janeiro": "rj",
+  "rio grande do norte": "rn", "rio grande do sul": "rs", rondonia: "ro",
+  roraima: "rr", "santa catarina": "sc", "sao paulo": "sp", sergipe: "se",
+  tocantins: "to",
+};
+
+// Converte o valor de uf/estado (já normalizado) para a sigla de 2 letras.
+function ufCode(ufNorm: string): string {
+  if (!ufNorm) return "";
+  if (ufNorm.length === 2) return ufNorm;
+  return UF_NAME_TO_CODE[ufNorm] ?? "";
+}
 
 // Remove acentos, baixa caixa e apara espaços — para casar nomes de lugares
 // independente de como foram digitados ("São Paulo" === "sao paulo").
@@ -188,13 +209,41 @@ function parsePlaceTable(raw: string | null): PlaceTable {
   return table;
 }
 
-// Resolve a coordenada de uma ocorrência, em cascata:
-//   1) lat/lng explícitos (mais preciso) — usados como estão
-//   2) cidade + bairro -> tabela do usuário
-//   3) bairro -> tabela do usuário
-//   4) cidade -> tabela do usuário
-//   5) uf/estado -> tabela embutida dos estados do Brasil
-// Retorna null quando nenhum critério resolve (a ocorrência é ignorada).
+// Índice cidade -> coordenada construído UMA vez a partir da base de municípios.
+// Para cidades cujo nome existe em vários estados (homônimos), preferimos a
+// capital; caso contrário, a primeira ocorrência. Usado quando a cidade vem
+// sem UF para desempatar.
+const MUNI_CITY_ONLY: { [city: string]: Coord } = (() => {
+  const idx: { [city: string]: Coord } = {};
+  for (const key in BR_MUNICIPALITIES) {
+    const slash = key.indexOf("/");
+    const uf = key.slice(0, slash);
+    const city = key.slice(slash + 1);
+    if (!(city in idx) || BR_CAPITALS[city] === uf) {
+      idx[city] = BR_MUNICIPALITIES[key];
+    }
+  }
+  return idx;
+})();
+
+// Tenta resolver uma cidade pela base embutida do IBGE. Com UF, usa a chave
+// exata "uf/cidade" (desambigua homônimos); sem UF, cai no índice cidade-only.
+function resolveCity(cidade: string, uf: string): Coord | null {
+  if (!cidade) return null;
+  if (uf) {
+    const exact = BR_MUNICIPALITIES[`${uf}/${cidade}`];
+    if (exact) return exact;
+  }
+  return MUNI_CITY_ONLY[cidade] ?? null;
+}
+
+// Resolve a coordenada de uma ocorrência, em cascata (do mais preciso ao mais geral):
+//   1) lat/lng explícitos — usados como estão
+//   2) tabela do usuário (placesJson): cidade/bairro, bairro, cidade
+//   3) cidade -> base embutida dos 5.570 municípios do Brasil (IBGE)
+//   4) uf/estado -> tabela embutida dos centroides dos estados
+// Bairro sem coordenada na placesJson "cai" para o centroide da cidade (passo 3).
+// Retorna null quando nada resolve (a ocorrência é ignorada).
 function resolveLocation(item: any, places: PlaceTable): Coord | null {
   const lat = Number(item.lat ?? item.latitude);
   const lng = Number(item.lng ?? item.longitude);
@@ -202,7 +251,10 @@ function resolveLocation(item: any, places: PlaceTable): Coord | null {
 
   const cidade = normalize(item.cidade ?? item.city);
   const bairro = normalize(item.bairro ?? item.neighborhood ?? item.district);
+  const ufRaw = normalize(item.uf ?? item.estado ?? item.state);
+  const uf = ufCode(ufRaw);
 
+  // 2) Tabela do usuário tem prioridade (permite precisão por bairro).
   const candidates: string[] = [];
   if (cidade && bairro) candidates.push(`${cidade}/${bairro}`);
   if (bairro) candidates.push(bairro);
@@ -211,7 +263,11 @@ function resolveLocation(item: any, places: PlaceTable): Coord | null {
     if (places[key]) return places[key];
   }
 
-  const uf = normalize(item.uf ?? item.estado ?? item.state);
+  // 3) Base embutida de municípios (cidade resolve sozinha, sem configuração).
+  const city = resolveCity(cidade, uf);
+  if (city) return city;
+
+  // 4) Por fim, o centroide do estado.
   if (uf && BR_STATE_CENTROIDS[uf]) return BR_STATE_CENTROIDS[uf];
 
   return null;
