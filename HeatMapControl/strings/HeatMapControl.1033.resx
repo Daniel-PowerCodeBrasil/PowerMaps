@@ -41,7 +41,9 @@
   <data name="HeatMapControl_DisplayName" xml:space="preserve"><value>Mapa de Calor</value></data>
   <data name="HeatMapControl_Description" xml:space="preserve"><value>Exibe ocorrências geolocalizadas como mapa de calor ou marcadores num mapa interativo.</value></data>
   <data name="occurrencesJson_DisplayName" xml:space="preserve"><value>Ocorrências (JSON)</value></data>
-  <data name="occurrencesJson_Desc" xml:space="preserve"><value>Array JSON: [{"lat":-22.2,"lng":-49.9,"weight":1,"label":"..."}, ...]</value></data>
+  <data name="occurrencesJson_Desc" xml:space="preserve"><value>Array JSON. Cada item pode ter lat/lng OU nomes (uf/estado, cidade, bairro): [{"lat":-22.2,"lng":-49.9,"weight":1,"label":"..."},{"cidade":"Bauru","bairro":"Centro"},{"uf":"SP"}]</value></data>
+  <data name="placesJson_DisplayName" xml:space="preserve"><value>Tabela de Lugares (JSON)</value></data>
+  <data name="placesJson_Desc" xml:space="preserve"><value>Tabela opcional cidade/bairro -> coordenadas, para resolver ocorrências sem lat/lng: [{"cidade":"Bauru","bairro":"Centro","lat":-22.31,"lng":-49.06}]. Estados do Brasil (UF) já são reconhecidos sem configuração.</value></data>
   <data name="enableHeatmap_DisplayName" xml:space="preserve"><value>Ativar Mapa de Calor</value></data>
   <data name="enableHeatmap_Desc" xml:space="preserve"><value>Quando ativo, exibe heatmap. Quando inativo, exibe marcadores.</value></data>
   <data name="heatRadius_DisplayName" xml:space="preserve"><value>Raio do Calor (px)</value></data>

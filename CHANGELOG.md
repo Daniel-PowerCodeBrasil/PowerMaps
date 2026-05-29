@@ -6,6 +6,29 @@ e o versionamento segue o [SemVer](https://semver.org/lang/pt-BR/).
 
 ---
 
+## [1.2.0] — 2026-05-29
+
+### Adicionado
+- **Ocorrências sem lat/lng** agora podem ser localizadas por **nome**. Cada item
+  de `occurrencesJson` pode trazer, em vez de coordenadas:
+  - `uf` ou `estado` (ex.: `"SP"`, `"São Paulo"`) — resolvido por uma **tabela
+    embutida com os centroides dos 27 estados do Brasil**, sem nenhuma configuração;
+  - `cidade` e/ou `bairro` — resolvidos por uma **tabela de referência** que você
+    fornece na nova propriedade `placesJson`.
+- Nova propriedade **`placesJson`**: tabela opcional `cidade`/`bairro` → coordenadas.
+  Aceita formato em array (`[{"cidade":"Bauru","bairro":"Centro","lat":...,"lng":...}]`)
+  ou objeto (`{"bauru/centro":{"lat":...,"lng":...}}`).
+- **Resolução em cascata** por ocorrência: `lat/lng` → `cidade`+`bairro` → `bairro`
+  → `cidade` → `uf`/`estado`. Nomes são comparados sem acento e sem diferença de caixa.
+- **Agregação por centroide**: ocorrências que caem no mesmo ponto (~11 m) somam o
+  peso (o calor reflete a contagem) e, no modo marcadores, viram um único pino com
+  o total no popup (ex.: *"Centro - Bauru: 12 ocorrências"*).
+
+### Notas
+- Estados resolvem para o **centro geográfico** do estado — o calor aparece como um
+  ponto único no meio do estado, não preenchendo o contorno. É o comportamento
+  esperado do "calor por centroide". Para granularidade fina, prefira cidade/bairro.
+
 ## [1.1.5] — 2026-05-29
 
 ### Corrigido

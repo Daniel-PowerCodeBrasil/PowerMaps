@@ -30,12 +30,93 @@ A propriedade `occurrencesJson` espera **uma string contendo um array JSON**:
 
 | Campo | Obrigatório | Observação |
 |---|---|---|
-| `lat` ou `latitude` | ✅ | Número decimal |
-| `lng` ou `longitude` | ✅ | Número decimal |
+| `lat` ou `latitude` | ⬦ | Número decimal. Opcional **se** você informar nome (veja abaixo) |
+| `lng` ou `longitude` | ⬦ | Número decimal. Opcional **se** você informar nome |
+| `uf` ou `estado` | ⬦ | Sigla ou nome do estado (resolvido pela tabela embutida) |
+| `cidade` | ⬦ | Resolvido pela `placesJson` |
+| `bairro` | ⬦ | Resolvido pela `placesJson` |
 | `weight` | ❌ | Peso no calor (padrão `1`) |
 | `label` | ❌ | Texto do popup (modo marcadores) |
 
-Pontos com `lat`/`lng` inválidos são **ignorados silenciosamente** — o mapa não quebra.
+⬦ = informe **lat/lng** _ou_ pelo menos um nome (`uf`/`estado`, `cidade`, `bairro`).
+Veja **[Não tenho lat/lng](#não-tenho-latlng--só-bairro-cidade-ou-estado)** logo abaixo.
+
+Ocorrências que não trazem coordenada **nem** um nome reconhecível são **ignoradas
+silenciosamente** — o mapa não quebra.
+
+---
+
+## Não tenho lat/lng — só bairro, cidade ou estado
+
+A partir da **v1.2.0**, uma ocorrência pode ser localizada **por nome**, sem
+coordenadas. O componente resolve a posição na seguinte ordem:
+
+1. `lat`/`lng` (se existirem, sempre vencem — é o mais preciso)
+2. `cidade` + `bairro`
+3. `bairro`
+4. `cidade`
+5. `uf` / `estado`
+
+Os nomes são comparados **sem acento e sem diferença de maiúsculas** (`"São Paulo"`
+= `"sao paulo"`).
+
+### Estados do Brasil: funcionam de graça 🇧🇷
+
+Os centroides dos **27 estados** já vêm embutidos. Basta a ocorrência ter `uf` ou
+`estado`:
+
+```json
+[
+  { "uf": "SP" },
+  { "estado": "Rio de Janeiro", "weight": 3 },
+  { "uf": "MG", "label": "Belo Horizonte" }
+]
+```
+
+> ⚠️ Estado vira um **único ponto no centro geográfico** do estado (calor por
+> centroide). Ótimo para um panorama nacional; para detalhe dentro de uma cidade,
+> use bairro.
+
+### Cidades e bairros: você fornece a tabela (`placesJson`)
+
+Como os centroides de cidade/bairro mudam de projeto pra projeto, eles vêm de uma
+**tabela de referência** que você passa na propriedade `placesJson`:
+
+```powerfx
+// placesJson
+"[{""cidade"":""Bauru"",""bairro"":""Centro"",""lat"":-22.3147,""lng"":-49.0606},{""cidade"":""Bauru"",""bairro"":""Vila Nova"",""lat"":-22.3220,""lng"":-49.0710},{""cidade"":""Marília"",""lat"":-22.2171,""lng"":-49.9501}]"
+```
+
+E aí as ocorrências referenciam só pelos nomes:
+
+```powerfx
+// occurrencesJson
+"[{""cidade"":""Bauru"",""bairro"":""Centro""},{""cidade"":""Bauru"",""bairro"":""Centro""},{""cidade"":""Marília""}]"
+```
+
+No exemplo acima, as duas ocorrências do Centro de Bauru são **agregadas** num só
+ponto (peso somado = 2). No modo marcadores, o popup mostra *"Centro: 2 ocorrências"*.
+
+> 💡 **De onde tiro os centroides?** Monte a tabela uma vez (planilha, tabela do
+> Dataverse, etc.). Para cidades, o centro aproximado já resolve bem o calor; para
+> bairros, use o centro do bairro.
+
+### Misturando tudo
+
+Pode misturar livremente pontos exatos, bairros, cidades e estados no mesmo
+`occurrencesJson` — cada um resolve pelo critério mais específico que tiver:
+
+```json
+[
+  { "lat": -22.3147, "lng": -49.0606, "label": "Endereço exato" },
+  { "cidade": "Bauru", "bairro": "Centro" },
+  { "cidade": "Marília" },
+  { "uf": "SP" }
+]
+```
+
+> 🔎 Ocorrências cujo nome **não bate** com nada na tabela (nem com um estado) são
+> **ignoradas silenciosamente** — o mapa não quebra. Confira a grafia na `placesJson`.
 
 ---
 

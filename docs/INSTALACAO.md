@@ -23,8 +23,8 @@ Baixe o pacote gerenciado mais recente da pasta de releases:
 releases/PowerMaps_HeatMapControl_latest_managed.zip
 ```
 
-> Esse é o mesmo arquivo da versão estável atual (hoje, `1.1.5`). Cada versão
-> também fica disponível com o número no nome, ex.: `PowerMaps_HeatMapControl_1_1_5_0_managed.zip`.
+> Esse é o mesmo arquivo da versão estável atual (hoje, `1.2.0`). Cada versão
+> também fica disponível com o número no nome, ex.: `PowerMaps_HeatMapControl_1_2_0_0_managed.zip`.
 
 ---
 

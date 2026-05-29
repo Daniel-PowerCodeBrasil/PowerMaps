@@ -72,7 +72,8 @@ HeatMapControl1.Height = Parent.Height
 
 | Propriedade | Tipo | Padrão | O que faz |
 |---|---|---|---|
-| `occurrencesJson` | `Multiple` (texto) | — | Array JSON com os pontos. Veja o formato abaixo. |
+| `occurrencesJson` | `Multiple` (texto) | — | Array JSON com os pontos. Aceita `lat`/`lng` **ou** nomes (`uf`/`estado`, `cidade`, `bairro`). Veja o formato abaixo. |
+| `placesJson` | `Multiple` (texto) | — | Tabela opcional `cidade`/`bairro` → coordenadas, para resolver ocorrências sem `lat`/`lng`. Estados do Brasil já são reconhecidos sem isso. |
 | `enableHeatmap` | `TwoOptions` | `true` | `true` = mapa de calor · `false` = marcadores |
 | `heatRadius` | `Whole.None` | `50` | Raio (px) do halo de cada ponto. Maior = manchas maiores |
 | `heatBlur` | `Whole.None` | `25` | Suavização das bordas. Maior = mais difuso |
@@ -93,10 +94,20 @@ HeatMapControl1.Height = Parent.Height
 
 | Campo | Obrigatório | Observação |
 |---|---|---|
-| `lat` / `latitude` | ✅ | Aceita os dois nomes |
-| `lng` / `longitude` | ✅ | Aceita os dois nomes |
+| `lat` / `latitude` | ⬦ | Aceita os dois nomes. Opcional se informar nome |
+| `lng` / `longitude` | ⬦ | Aceita os dois nomes. Opcional se informar nome |
+| `uf` / `estado` | ⬦ | Sigla ou nome do estado — resolvido pela tabela embutida (27 UFs) |
+| `cidade` / `bairro` | ⬦ | Resolvidos pela `placesJson` |
 | `weight` | ❌ | Peso do ponto no calor (padrão `1`) |
 | `label` | ❌ | Texto do popup no modo marcadores |
+
+⬦ = informe **lat/lng** _ou_ pelo menos um nome. Detalhes e exemplos em
+[docs/USO.md](docs/USO.md#não-tenho-latlng--só-bairro-cidade-ou-estado).
+
+> Ex.: localizar por estado, sem coordenada nenhuma:
+> ```json
+> [ { "uf": "SP" }, { "estado": "Rio de Janeiro", "weight": 3 } ]
+> ```
 
 > 💡 **Para medir densidade de incidentes, use `weight: 1` em todos os pontos.** Assim a cor reflete *quantidade de ocorrências por região*, não a gravidade de cada uma. Detalhes em [docs/USO.md](docs/USO.md#peso-densidade-x-gravidade).
 

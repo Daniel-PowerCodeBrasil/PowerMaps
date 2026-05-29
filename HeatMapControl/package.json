@@ -1,6 +1,6 @@
 {
   "name": "powermaps-heatmapcontrol",
-  "version": "1.1.5",
+  "version": "1.2.0",
   "description": "PowerMaps HeatMapControl — a Power Apps Component Framework (PCF) virtual control that renders geolocated occurrences as an interactive Leaflet heat map or pin markers inside Canvas Apps.",
   "author": "Daniel (PowerCodeBrasil)",
   "license": "MIT",

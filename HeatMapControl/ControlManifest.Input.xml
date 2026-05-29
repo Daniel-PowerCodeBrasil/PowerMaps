@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="PowerMapsBR" constructor="HeatMapControl" version="1.1.5"
+  <control namespace="PowerMapsBR" constructor="HeatMapControl" version="1.2.0"
            display-name-key="HeatMapControl_DisplayName"
            description-key="HeatMapControl_Description"
            control-type="virtual">
@@ -9,6 +9,10 @@
 
     <property name="occurrencesJson" display-name-key="occurrencesJson_DisplayName"
               description-key="occurrencesJson_Desc"
+              of-type="Multiple" usage="input" required="false" />
+
+    <property name="placesJson" display-name-key="placesJson_DisplayName"
+              description-key="placesJson_Desc"
               of-type="Multiple" usage="input" required="false" />
 
     <property name="enableHeatmap" display-name-key="enableHeatmap_DisplayName"

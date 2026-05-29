@@ -8,10 +8,54 @@ interface OccurrencePoint {
   lng: number;
   weight: number;
   label: string;
+  count: number;
 }
 
 const DEFAULT_TILE_URL =
   "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+
+// Centroides aproximados dos 27 estados do Brasil (26 estados + DF).
+// Indexados tanto pela sigla (UF) quanto pelo nome normalizado, para que uma
+// ocorrência com "uf":"SP" ou "estado":"São Paulo" seja resolvida sem configuração.
+const BR_STATE_CENTROIDS: { [key: string]: [number, number] } = {
+  ac: [-9.02, -70.81], acre: [-9.02, -70.81],
+  al: [-9.62, -36.66], alagoas: [-9.62, -36.66],
+  ap: [0.9, -52.0], amapa: [0.9, -52.0],
+  am: [-4.15, -64.7], amazonas: [-4.15, -64.7],
+  ba: [-12.5, -41.7], bahia: [-12.5, -41.7],
+  ce: [-5.09, -39.62], ceara: [-5.09, -39.62],
+  df: [-15.78, -47.93], "distrito federal": [-15.78, -47.93],
+  es: [-19.57, -40.66], "espirito santo": [-19.57, -40.66],
+  go: [-15.93, -50.14], goias: [-15.93, -50.14],
+  ma: [-4.96, -45.27], maranhao: [-4.96, -45.27],
+  mt: [-13.0, -55.4], "mato grosso": [-13.0, -55.4],
+  ms: [-20.5, -54.6], "mato grosso do sul": [-20.5, -54.6],
+  mg: [-18.5, -44.5], "minas gerais": [-18.5, -44.5],
+  pa: [-4.0, -52.9], para: [-4.0, -52.9],
+  pb: [-7.12, -36.72], paraiba: [-7.12, -36.72],
+  pr: [-24.6, -51.6], parana: [-24.6, -51.6],
+  pe: [-8.4, -37.9], pernambuco: [-8.4, -37.9],
+  pi: [-7.7, -42.7], piaui: [-7.7, -42.7],
+  rj: [-22.25, -42.66], "rio de janeiro": [-22.25, -42.66],
+  rn: [-5.81, -36.59], "rio grande do norte": [-5.81, -36.59],
+  rs: [-30.0, -53.5], "rio grande do sul": [-30.0, -53.5],
+  ro: [-10.9, -63.3], rondonia: [-10.9, -63.3],
+  rr: [2.0, -61.4], roraima: [2.0, -61.4],
+  sc: [-27.4, -50.9], "santa catarina": [-27.4, -50.9],
+  sp: [-22.2, -48.8], "sao paulo": [-22.2, -48.8],
+  se: [-10.6, -37.4], sergipe: [-10.6, -37.4],
+  to: [-10.2, -48.3], tocantins: [-10.2, -48.3],
+};
+
+// Remove acentos, baixa caixa e apara espaços — para casar nomes de lugares
+// independente de como foram digitados ("São Paulo" === "sao paulo").
+function normalize(value: unknown): string {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .trim();
+}
 const HEAT_GRADIENT: { [key: number]: string } = {
   0.1: "#FFEDA0",
   0.3: "#FEB24C",
@@ -89,29 +133,125 @@ function injectStyles(): void {
   document.head.appendChild(style);
 }
 
-function parsePoints(raw: string | null): OccurrencePoint[] {
-  if (!raw) return [];
+type Coord = [number, number];
+type PlaceTable = { [key: string]: Coord };
+
+// Constrói uma tabela de lookup (nome normalizado -> coordenada) a partir do JSON
+// fornecido pelo usuário em `placesJson`. Aceita dois formatos:
+//   1) Array: [{ "cidade":"Bauru", "bairro":"Centro", "lat":-22.3, "lng":-49.0 }, ...]
+//   2) Objeto: { "bauru": {"lat":-22.3,"lng":-49.0}, "bauru/centro": {...} }
+// Para o formato em array, indexamos por cidade/bairro, por bairro e por cidade,
+// para casar a chave mais específica disponível na ocorrência.
+function parsePlaceTable(raw: string | null): PlaceTable {
+  const table: PlaceTable = {};
+  if (!raw) return table;
+  let parsed: unknown;
   try {
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.reduce<OccurrencePoint[]>((acc, item) => {
-      const lat = Number(item.lat ?? item.latitude);
-      const lng = Number(item.lng ?? item.longitude);
-      if (isNaN(lat) || isNaN(lng)) return acc;
-      acc.push({
-        lat,
-        lng,
-        weight:
-          item.weight != null && !isNaN(Number(item.weight))
-            ? Number(item.weight)
-            : 1,
-        label: item.label != null ? String(item.label) : "",
-      });
-      return acc;
-    }, []);
+    parsed = JSON.parse(raw);
+  } catch {
+    return table;
+  }
+
+  const put = (key: string, lat: number, lng: number) => {
+    if (key) table[key] = [lat, lng];
+  };
+
+  if (Array.isArray(parsed)) {
+    for (const p of parsed) {
+      const lat = Number(p.lat ?? p.latitude);
+      const lng = Number(p.lng ?? p.longitude);
+      if (isNaN(lat) || isNaN(lng)) continue;
+      const cidade = normalize(p.cidade ?? p.city);
+      const bairro = normalize(p.bairro ?? p.neighborhood ?? p.district);
+      const nome = normalize(p.name ?? p.nome);
+      if (cidade && bairro) put(`${cidade}/${bairro}`, lat, lng);
+      if (bairro) put(bairro, lat, lng);
+      if (cidade) put(cidade, lat, lng);
+      if (nome) put(nome, lat, lng);
+    }
+  } else if (parsed && typeof parsed === "object") {
+    for (const key of Object.keys(parsed as Record<string, unknown>)) {
+      const v = (parsed as Record<string, { lat?: number; lng?: number; latitude?: number; longitude?: number }>)[key];
+      const lat = Number(v.lat ?? v.latitude);
+      const lng = Number(v.lng ?? v.longitude);
+      if (!isNaN(lat) && !isNaN(lng)) put(normalize(key), lat, lng);
+    }
+  }
+  return table;
+}
+
+// Resolve a coordenada de uma ocorrência, em cascata:
+//   1) lat/lng explícitos (mais preciso) — usados como estão
+//   2) cidade + bairro -> tabela do usuário
+//   3) bairro -> tabela do usuário
+//   4) cidade -> tabela do usuário
+//   5) uf/estado -> tabela embutida dos estados do Brasil
+// Retorna null quando nenhum critério resolve (a ocorrência é ignorada).
+function resolveLocation(item: any, places: PlaceTable): Coord | null {
+  const lat = Number(item.lat ?? item.latitude);
+  const lng = Number(item.lng ?? item.longitude);
+  if (!isNaN(lat) && !isNaN(lng)) return [lat, lng];
+
+  const cidade = normalize(item.cidade ?? item.city);
+  const bairro = normalize(item.bairro ?? item.neighborhood ?? item.district);
+
+  const candidates: string[] = [];
+  if (cidade && bairro) candidates.push(`${cidade}/${bairro}`);
+  if (bairro) candidates.push(bairro);
+  if (cidade) candidates.push(cidade);
+  for (const key of candidates) {
+    if (places[key]) return places[key];
+  }
+
+  const uf = normalize(item.uf ?? item.estado ?? item.state);
+  if (uf && BR_STATE_CENTROIDS[uf]) return BR_STATE_CENTROIDS[uf];
+
+  return null;
+}
+
+// Texto de fallback para o rótulo, quando a ocorrência não traz `label`.
+function defaultLabel(item: any): string {
+  const parts = [
+    item.bairro ?? item.neighborhood ?? item.district,
+    item.cidade ?? item.city,
+    item.uf ?? item.estado ?? item.state,
+  ].filter((p) => p != null && String(p).trim() !== "");
+  return parts.map((p) => String(p)).join(" - ");
+}
+
+function parsePoints(raw: string | null, places: PlaceTable): OccurrencePoint[] {
+  if (!raw) return [];
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
   } catch {
     return [];
   }
+  if (!Array.isArray(parsed)) return [];
+
+  // Agrega ocorrências que caem no mesmo ponto (~11 m). Para o calor, os pesos
+  // somam, refletindo a contagem; para marcadores, vira um único pino com total.
+  const agg = new Map<string, OccurrencePoint>();
+  for (const item of parsed) {
+    const coord = resolveLocation(item, places);
+    if (!coord) continue;
+    const [lat, lng] = coord;
+    const weight =
+      item.weight != null && !isNaN(Number(item.weight))
+        ? Number(item.weight)
+        : 1;
+    const label = item.label != null ? String(item.label) : defaultLabel(item);
+    const key = `${lat.toFixed(4)},${lng.toFixed(4)}`;
+    const existing = agg.get(key);
+    if (existing) {
+      existing.weight += weight;
+      existing.count += 1;
+      if (!existing.label && label) existing.label = label;
+    } else {
+      agg.set(key, { lat, lng, weight, label, count: 1 });
+    }
+  }
+  return Array.from(agg.values());
 }
 
 interface MapProps {
@@ -255,10 +395,15 @@ const HeatMap: React.FC<MapProps> = (props) => {
             color: "#C8185A",
             fillColor: "#C8185A",
             fillOpacity: 0.7,
-            radius: 7,
+            // Pontos agregados (várias ocorrências no mesmo local) ganham um
+            // raio um pouco maior, para dar uma noção visual de volume.
+            radius: pt.count > 1 ? Math.min(7 + pt.count, 18) : 7,
             weight: 1,
           });
-          if (pt.label) m.bindPopup(pt.label);
+          const base = pt.label || "Local";
+          const popup =
+            pt.count > 1 ? `${base}: ${pt.count} ocorrências` : base;
+          m.bindPopup(popup);
           m.addTo(markerLayerRef.current);
         } catch { /* ignore */ }
       }
@@ -307,8 +452,9 @@ export class HeatMapControl
 
   updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
     const props = context.parameters;
+    const placeTable = parsePlaceTable(props.placesJson.raw);
     return React.createElement(HeatMap, {
-      points: parsePoints(props.occurrencesJson.raw),
+      points: parsePoints(props.occurrencesJson.raw, placeTable),
       enableHeatmap: props.enableHeatmap.raw ?? true,
       heatRadius: (props.heatRadius.raw as number) ?? 50,
       heatBlur: (props.heatBlur.raw as number) ?? 25,
