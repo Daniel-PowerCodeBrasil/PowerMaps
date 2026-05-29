@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="PowerMapsBR" constructor="HeatMapControl" version="1.1.2"
+  <control namespace="PowerMapsBR" constructor="HeatMapControl" version="1.1.3"
            display-name-key="HeatMapControl_DisplayName"
            description-key="HeatMapControl_Description"
            control-type="virtual">

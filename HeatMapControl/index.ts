@@ -233,9 +233,11 @@ const HeatMap: React.FC<MapProps> = (props) => {
   }, [props.points, props.enableHeatmap, props.heatRadius, props.heatBlur, props.heatIntensity, props.heatMaxZoom, props.mapRef]);
 
   const wrapperStyle: React.CSSProperties = {
-    width: props.width > 0 ? props.width + "px" : "100%",
-    height: props.height > 0 ? props.height + "px" : "100%",
-    position: "relative",
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+    top: 0,
+    left: 0,
   };
 
   return React.createElement(
